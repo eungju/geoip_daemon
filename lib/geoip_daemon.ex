@@ -1,0 +1,2 @@
+defmodule GeoipDaemon do
+end

@@ -1,0 +1,7 @@
+%{"cowboy": {:package, "1.0.0"},
+  "cowlib": {:package, "1.0.0"},
+  "geolix": {:git, "git://github.com/mneudert/geolix.git", "9607e7f927570dfb9b518f43c387a9dc53476e9b", []},
+  "jazz": {:package, "0.2.1"},
+  "plug": {:package, "0.7.0"},
+  "plug_code_reloader": {:git, "git://github.com/AgilionApps/PlugCodeReloader.git", "e18fe98e7022d2c6335360bcc273d31969e698b8", []},
+  "ranch": {:package, "1.0.0"}}
