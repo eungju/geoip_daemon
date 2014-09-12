@@ -13,7 +13,7 @@ defmodule GeoipDaemon.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [applications: [:geolix, :cowboy, :plug, :logger, :plug_code_reloader],
-     mod: {GeoipDaemon.Application, []}]
+     mod: {GeoipDaemon, []}]
   end
 
   # Dependencies can be Hex packages:
