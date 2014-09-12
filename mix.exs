@@ -12,7 +12,11 @@ defmodule GeoipDaemon.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:geolix, :cowboy, :plug, :logger, :plug_code_reloader],
+    apps = [:logger, :geolix, :poison, :cowboy, :plug]
+    dev_apps = [:plug_code_reloader]
+    [applications: case Mix.env do
+                     :dev -> apps ++ dev_apps
+                     _ -> apps end,
      mod: {GeoipDaemon, []}]
   end
 
@@ -27,10 +31,11 @@ defmodule GeoipDaemon.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [{:geolix, github: "mneudert/geolix" },
-     {:jazz, "~> 0.2.1"},
-     {:cowboy, "~> 1.0.0"},
+     {:poison, "~> 1.1.1"},
      {:plug, "~> 0.7.0"},
+     {:cowboy, "~> 1.0.0"},
+     {:exrm, "~> 0.14.7"},
 
-     {:plug_code_reloader, github: "AgilionApps/PlugCodeReloader"}]
+     {:plug_code_reloader, github: "AgilionApps/PlugCodeReloader", only: [:dev]}]
   end
 end

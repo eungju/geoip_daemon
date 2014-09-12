@@ -2,7 +2,7 @@ defmodule GeoipDaemon.RestPlug do
   import Plug.Conn
   use Plug.Router
 
-  use Jazz
+  alias Poison, as: JSON
 
   plug :match
   plug :dispatch
