@@ -18,9 +18,9 @@ defmodule GeoipDaemon.RestPlug do
     send_resp(conn, 404, "Not found.")
   end
 
-  get "/databases/:db/:ip" do
+  get "/databases/:db_name/:ip" do
     conn = conn |> fetch_params
-    lookup_record = case db do
+    lookup_record = case db_name do
                       "country" -> &Geolix.country/1
                       "city" -> &Geolix.city/1
                       _ -> fn _ -> nil end
