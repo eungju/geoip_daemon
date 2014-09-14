@@ -2,30 +2,44 @@ defmodule GeoipDaemon.GeoIP2 do
   defmodule Decoder do
     use Bitwise, only_operators: true
 
-    defp decode_integer(input, bytes) do
-      decode_integer(input, bytes, 0)
+    defp decode_unsigned(input, bytes) do
+      decode_unsigned(input, bytes, 0)
     end
-    defp decode_integer(input, 0, acc) do
+    defp decode_unsigned(input, 0, acc) do
       {acc, input}
     end
-    defp decode_integer(<<byte, rest :: binary>>, bytes, acc) do
-      decode_integer(rest, bytes - 1, acc <<< 8 ||| byte)
+    defp decode_unsigned(<<byte, rest :: binary>>, bytes, acc) do
+      decode_unsigned(rest, bytes - 1, acc <<< 8 ||| byte)
+    end
+
+    defp decode_signed(input, bytes) do
+      decode_signed(input, bytes, 0)
+    end
+    defp decode_signed(input, 0, acc) do
+      {acc, input}
+    end
+    defp decode_signed(<<byte :: signed, rest :: binary>>, bytes, acc) do
+      decode_signed(rest, bytes - 1, acc <<< 8 ||| byte)
     end
 
     defp decode_uint16(input, size) do
-      decode_integer(input, size)
+      decode_unsigned(input, size)
     end
 
     defp decode_uint32(input, size) do
-      decode_integer(input, size)
+      decode_unsigned(input, size)
     end
 
     defp decode_uint64(input, size) do
-      decode_integer(input, size)
+      decode_unsigned(input, size)
     end
 
     defp decode_uint128(input, size) do
-      decode_integer(input, size)
+      decode_unsigned(input, size)
+    end
+
+    defp decode_int32(input, size) do
+      decode_signed(input, size)
     end
 
     defp decode_double(<<value :: float, rest :: binary>>) do
@@ -81,7 +95,7 @@ defmodule GeoipDaemon.GeoIP2 do
 
     defp decode_payload_size(input, ctrl_size) do
       bytes = max(0, ctrl_size - 28)
-      {extended_size, remaining} = decode_integer(input, bytes)
+      {extended_size, remaining} = decode_unsigned(input, bytes)
       case bytes do
         0 -> {ctrl_size, remaining}
         1 -> {29 + extended_size, remaining}
@@ -99,6 +113,7 @@ defmodule GeoipDaemon.GeoIP2 do
         4 -> decode_bytes(remaining, size)
         5 -> decode_uint16(remaining, size)
         6 -> decode_uint32(remaining, size)
+        8 -> decode_int32(remaining, size)
         9 -> decode_uint64(remaining, size)
         10 -> decode_uint128(remaining, size)
         7 -> decode_map(remaining, size)

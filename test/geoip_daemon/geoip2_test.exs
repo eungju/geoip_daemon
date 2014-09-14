@@ -25,6 +25,11 @@ defmodule GeoipDaemon.GeoIP2Test do
     assert {4294967296 - 1, ""} == DUT.Decoder.decode(<<0b11000100, 255, 255, 255, 255>>)
   end
 
+  test "decode signed 32-bit int" do
+    assert {-1, ""} == DUT.Decoder.decode(<<0b00000001, 0b00000001, 255>>)
+    assert {-1, ""} == DUT.Decoder.decode(<<0b00000100, 0b00000001, 255, 255, 255, 255>>)
+  end
+
   test "decode unsigned 64-bit int" do
     assert {(1 <<< 64) - 1, ""} == DUT.Decoder.decode(<<0b00001000, 0b00000010>> <> IO.iodata_to_binary(Enum.take(Stream.cycle([255]), 8)))
   end
