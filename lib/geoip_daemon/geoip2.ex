@@ -104,6 +104,22 @@ defmodule GeoipDaemon.GeoIP2 do
       end
     end
 
+    def decode(<<1 :: size(3), ss :: size(2), vvv :: size(3), rest :: binary>>) do
+      case ss do
+        0 ->
+          {v, remaining} = decode_unsigned(rest, 1)
+          p = (vvv <<< 8) ||| v
+        1 ->
+          {v, remaining} = decode_unsigned(rest, 2)
+          p = ((vvv <<< 16) ||| v) + (1 <<< 8 + 3)
+        2 ->
+          {v, remaining} = decode_unsigned(rest, 3)
+          p = ((vvv <<< 24) ||| v) + (1 <<< 8 + 3) + (1 <<< 16 + 3)
+        3 ->
+          {p, remaining} = decode_unsigned(rest, 4)
+      end
+      {{:pointer, p}, remaining}
+    end
     def decode(<<ctrl_type :: size(3), ctrl_size :: size(5), rest :: binary>>) do
       {type, remaining} = decode_extended_type(rest, ctrl_type)
       {size, remaining} = decode_payload_size(remaining, ctrl_size)

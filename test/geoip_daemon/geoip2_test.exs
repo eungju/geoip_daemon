@@ -3,6 +3,13 @@ defmodule GeoipDaemon.GeoIP2Test do
   use Bitwise
   alias GeoipDaemon.GeoIP2, as: DUT
 
+  test "decode pointer" do
+    assert {{:pointer, 0x01FF}, ""} == DUT.Decoder.decode(<<0b00100001, 255>>)
+    assert {{:pointer, 0x0100FF + 2048}, ""} == DUT.Decoder.decode(<<0b00101001, 0, 255>>)
+    assert {{:pointer, 0x010000FF + 526336}, ""} == DUT.Decoder.decode(<<0b00110001, 0, 0, 255>>)
+    assert {{:pointer, 0x12345678}, ""} == DUT.Decoder.decode(<<0b00111000, 0x12, 0x34, 0x56, 0x78>>)
+  end
+
   test "decode string" do
     assert {"Hello", ""} == DUT.Decoder.decode(<<0b01000101>> <> "Hello")
   end
@@ -31,11 +38,13 @@ defmodule GeoipDaemon.GeoIP2Test do
   end
 
   test "decode unsigned 64-bit int" do
-    assert {(1 <<< 64) - 1, ""} == DUT.Decoder.decode(<<0b00001000, 0b00000010>> <> IO.iodata_to_binary(Enum.take(Stream.cycle([255]), 8)))
+    v = (1 <<< 64) - 1
+    assert {v, ""} == DUT.Decoder.decode(<<0b00001000, 0b00000010>> <> <<v :: size(64)>>)
   end
 
   test "decode unsigned 128-bit int" do
-    assert {(1 <<< 128) - 1, ""} == DUT.Decoder.decode(<<0b00010000, 0b00000011>> <> IO.iodata_to_binary(Enum.take(Stream.cycle([255]), 16)))
+    v = (1 <<< 128) - 1
+    assert {v, ""} == DUT.Decoder.decode(<<0b00010000, 0b00000011>> <> <<v :: size(128)>>)
   end
 
   test "decode map" do
