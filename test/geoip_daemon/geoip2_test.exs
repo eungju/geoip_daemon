@@ -59,9 +59,9 @@ defmodule GeoipDaemon.GeoIP2Test do
   end
 
   test "read metadata" do
-    path = "data/GeoLite2-Country.mmdb"
+    path = "MaxMind-DB/test-data/GeoIP2-Country-Test.mmdb"
     fd = File.open!(path, [:read, :binary, :raw])
     stat = File.stat!(path)
-    assert {:ok, %{"binary_format_major_version" => 2}} = DUT.Reader.read_metadata(fd, stat.size)
+    assert {:ok, %{"binary_format_major_version" => 3}} = DUT.Reader.read_metadata(fd, stat.size)
   end
 end
